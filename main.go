@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
+	"github.com/sglkc/golang-news-api/routes"
 )
 
 func main() {
@@ -14,12 +16,10 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
-	r.Use(middleware.Heartbeat("/ping"))
-	r.Mount("/debug", middleware.Profiler())
+	r.Use(render.SetContentType(render.ContentTypeJSON))
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("HELLO WORLD!"))
-	})
+	r.Mount("/", routes.RootRoutes())
+	r.Mount("/news", routes.NewsRoutes())
 
 	http.ListenAndServe(":3000", r)
 }
