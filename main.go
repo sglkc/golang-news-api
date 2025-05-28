@@ -28,7 +28,7 @@ func main() {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Mount("/", routes.RootRoutes())
-	r.Mount("/news", routes.NewsRoutes())
+	r.Mount("/articles", routes.ArticlesRoutes())
 
 	http.ListenAndServe(":3000", r)
 }

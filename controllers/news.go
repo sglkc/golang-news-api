@@ -11,24 +11,24 @@ import (
 	"github.com/sglkc/golang-news-api/utils"
 )
 
-func ListNews(w http.ResponseWriter, r *http.Request) {
+func ListArticles(w http.ResponseWriter, r *http.Request) {
 	db, err := database.GetDB()
 	if err != nil {
 		utils.SendJSON(w, r, http.StatusInternalServerError, "Internal error")
 		return
 	}
 
-	var news []models.News
-	result := db.Find(&news)
+	var articles []models.Article
+	result := db.Find(&articles)
 	if result.Error != nil {
-		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot fetch news")
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot fetch articles")
 		return
 	}
 
-	utils.SendData(w, r, http.StatusOK, "Success", news)
+	utils.SendData(w, r, http.StatusOK, "Success", articles)
 }
 
-func GetNews(w http.ResponseWriter, r *http.Request) {
+func GetArticle(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid ID")
@@ -41,20 +41,19 @@ func GetNews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var news models.News
-	result := db.First(&news, id)
+	var article models.Article
+	result := db.First(&article, id)
 	if result.Error != nil {
-		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find news")
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find article")
 		return
 	}
 
-	utils.SendData(w, r, http.StatusOK, "Success", news)
+	utils.SendData(w, r, http.StatusOK, "Success", article)
 }
 
-func CreateNews(w http.ResponseWriter, r *http.Request) {
-	news := models.News{}
-
-	err := render.DecodeJSON(r.Body, &news)
+func CreateArticle(w http.ResponseWriter, r *http.Request) {
+	article := models.Article{}
+	err := render.DecodeJSON(r.Body, &article)
 	if err != nil {
 		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid body")
 		return
@@ -66,24 +65,24 @@ func CreateNews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := db.Create(&news)
+	result := db.Create(&article)
 	if result.Error != nil {
-		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot create news")
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot create article")
 		return
 	}
 
-	utils.SendData(w, r, http.StatusCreated, "Success", news)
+	utils.SendData(w, r, http.StatusCreated, "Success", article)
 }
 
-func UpdateNews(w http.ResponseWriter, r *http.Request) {
+func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
-	newNews := models.News{}
-	err = render.DecodeJSON(r.Body, &newNews)
+	newArticle := models.Article{}
+	err = render.DecodeJSON(r.Body, &newArticle)
 	if err != nil {
 		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid body")
 		return
@@ -95,19 +94,19 @@ func UpdateNews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var news models.News
-	result := db.First(&news, id)
+	var article models.Article
+	result := db.First(&article, id)
 	if result.Error != nil {
-		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find news")
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find article")
 		return
 	}
 
-	result = db.Model(&news).Updates(&newNews)
+	result = db.Model(&article).Updates(&newArticle)
 
-	utils.SendData(w, r, http.StatusOK, "Success", news)
+	utils.SendData(w, r, http.StatusOK, "Success", article)
 }
 
-func DeleteNews(w http.ResponseWriter, r *http.Request) {
+func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid ID")
@@ -121,14 +120,14 @@ func DeleteNews(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: fix double query
-	var news models.News
-	result := db.First(&news, id)
+	var article models.Article
+	result := db.First(&article, id)
 	if result.Error != nil {
-		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find news")
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find article")
 		return
 	}
 
-	db.Delete(&models.News{}, id)
+	db.Delete(&models.Article{}, id)
 
 	utils.SendJSON(w, r, http.StatusOK, "Success")
 }

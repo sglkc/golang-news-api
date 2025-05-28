@@ -10,7 +10,7 @@ func Migrate() error {
 		return err
 	}
 
-	err = db.AutoMigrate(&models.News{})
+	err = db.AutoMigrate(&models.Article{})
 	if err != nil {
 		return err
 	}
