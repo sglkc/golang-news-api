@@ -9,10 +9,10 @@ func NewsRoutes() chi.Router {
 	r := chi.NewRouter()
 
 	r.Get("/", controllers.ListNews)
-	r.Get("/:id", controllers.GetNews)
+	r.Get("/{id}", controllers.GetNews)
 	r.Post("/", controllers.CreateNews)
-	r.Put("/:id", controllers.UpdateNews)
-	r.Delete("/", controllers.DeleteNews)
+	r.Put("/{id}", controllers.UpdateNews)
+	r.Delete("/{id}", controllers.DeleteNews)
 
 	return r
 }

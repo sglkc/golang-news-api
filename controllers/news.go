@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/sglkc/golang-news-api/database"
 	"github.com/sglkc/golang-news-api/models"
@@ -26,7 +28,28 @@ func ListNews(w http.ResponseWriter, r *http.Request) {
 	utils.SendData(w, r, http.StatusOK, "Success", news)
 }
 
-func GetNews(w http.ResponseWriter, r *http.Request) {}
+func GetNews(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	db, err := database.GetDB()
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Internal error")
+		return
+	}
+
+	var news models.News
+	result := db.First(&news, id)
+	if result.Error != nil {
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find news")
+		return
+	}
+
+	utils.SendData(w, r, http.StatusOK, "Success", news)
+}
 
 func CreateNews(w http.ResponseWriter, r *http.Request) {
 	news := models.News{}
@@ -54,4 +77,28 @@ func CreateNews(w http.ResponseWriter, r *http.Request) {
 
 func UpdateNews(w http.ResponseWriter, r *http.Request) {}
 
-func DeleteNews(w http.ResponseWriter, r *http.Request) {}
+func DeleteNews(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	db, err := database.GetDB()
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Internal error")
+		return
+	}
+
+	// TODO: fix double query
+	var news models.News
+	result := db.First(&news, id)
+	if result.Error != nil {
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find news")
+		return
+	}
+
+	db.Delete(&models.News{}, id)
+
+	utils.SendJSON(w, r, http.StatusOK, "Success")
+}
