@@ -75,7 +75,37 @@ func CreateNews(w http.ResponseWriter, r *http.Request) {
 	utils.SendData(w, r, http.StatusCreated, "Success", news)
 }
 
-func UpdateNews(w http.ResponseWriter, r *http.Request) {}
+func UpdateNews(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	newNews := models.News{}
+	err = render.DecodeJSON(r.Body, &newNews)
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusBadRequest, "Invalid body")
+		return
+	}
+
+	db, err := database.GetDB()
+	if err != nil {
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Internal error")
+		return
+	}
+
+	var news models.News
+	result := db.First(&news, id)
+	if result.Error != nil {
+		utils.SendJSON(w, r, http.StatusInternalServerError, "Cannot find news")
+		return
+	}
+
+	result = db.Model(&news).Updates(&newNews)
+
+	utils.SendData(w, r, http.StatusOK, "Success", news)
+}
 
 func DeleteNews(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
