@@ -25,7 +25,7 @@ func ListArticles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.SendData(w, r, http.StatusOK, "Success", articles)
+	utils.SendPage(w, r, articles)
 }
 
 func GetArticle(w http.ResponseWriter, r *http.Request) {

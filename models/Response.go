@@ -9,3 +9,9 @@ type DataResponse[T any] struct {
 	BaseResponse
 	Data T `json:"data"`
 }
+
+type PaginatedResponse[T any] struct {
+	DataResponse[[]T]
+	Count int `json:"count"`
+	Pages int `json:"pages"`
+}
